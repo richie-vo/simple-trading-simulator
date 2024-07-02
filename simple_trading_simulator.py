@@ -63,6 +63,10 @@ def simMultiTrades(repeat, initCap, winRate, riskRewardRatio, riskPerTrade, disp
     trough = initCap
     capital_history = [currentCap]
 
+    # Variables to track run-up during win streaks
+    winStreakStartCap = initCap
+    currentRunup = 0
+
     # Looping through the number of executions
     for trade in range(repeat):
         currentRiskPerTrade = calcCurrentRiskPerTrade(riskPerTrade, currentCap)
@@ -76,26 +80,28 @@ def simMultiTrades(repeat, initCap, winRate, riskRewardRatio, riskPerTrade, disp
             winCount += 1
             currentWinStreak += 1
             currentLossStreak = 0
+            currentRunup = (currentCap - winStreakStartCap) / winStreakStartCap * 100
             if currentWinStreak > longestWinStreak:
                 longestWinStreak = currentWinStreak
+            if currentRunup > maxProfitRunup:
+                maxProfitRunup = currentRunup
         else:
             lossCount += 1
             currentLossStreak += 1
             currentWinStreak = 0
+            currentRunup = 0
+            winStreakStartCap = currentCap  # Reset win streak start capital after a loss
             if currentLossStreak > longestLossStreak:
                 longestLossStreak = currentLossStreak
 
-        # Calculate drawdown and run-up
+        # Calculate drawdown
         if currentCap > peak:
             peak = currentCap
         if currentCap < trough:
             trough = currentCap
         drawdown = (peak - currentCap) / peak * 100
-        runup = (currentCap - trough) / trough * 100
         if drawdown > maxDrawdown:
             maxDrawdown = drawdown
-        if runup > maxProfitRunup:
-            maxProfitRunup = runup
 
         # Displaying the result of each trade if user opts for it
         if displayTrades(display):
@@ -143,6 +149,7 @@ def simMultiTrades(repeat, initCap, winRate, riskRewardRatio, riskPerTrade, disp
 
     # Log the results
     logStats(winCount, lossCount, initCap, winRate, riskRewardRatio, currentCap, repeat, longestWinStreak, longestLossStreak, maxDrawdown, maxProfitRunup)
+
 
 # This function will plot the capital change over time
 def plotCapitalChange(capital_history, initCap):
