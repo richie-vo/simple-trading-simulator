@@ -20,7 +20,7 @@ Welcome to the Simple Trading Simulator, a Python-based tool designed to test th
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/username/repository.git
+    git clone https://github.com/richie-vo/simple-trading-simulator.git
     cd repository
     ```
 
